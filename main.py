@@ -1,11 +1,12 @@
 
 import asyncio
 from google.adk.runners import InMemoryRunner
-from agent import build_agent
+
+from build_agent import build_agent
 
 
 async def main():
-    agent = build_agent()
+    agent = build_agent("researcher_agent_coordinator")
     runner = InMemoryRunner(agent=agent)
 
     prompt = input("User > ")
@@ -15,12 +16,17 @@ async def main():
     found_text = False
 
     for event in response:
-        if getattr(event, "author", None) == "helpful_assistant" and getattr(event, "content", None):
-            for part in event.content.parts:
-                text = getattr(part, "text", None)
-                if text:
-                    print(text)
-                    found_text = True
+        content = getattr(event, "content", None)
+        parts = getattr(content, "parts", None)
+
+        if not parts:
+            continue
+
+        for part in parts:
+            text = getattr(part, "text", None)
+            if text:
+                print(text)
+                found_text = True
 
     if not found_text:
         print("No text response found.")
