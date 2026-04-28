@@ -59,6 +59,71 @@ def sumarizer_agent(retry_config) -> Agent:
     )
 
 
+def tech_researcher(retry_config) -> Agent:
+    return Agent(
+        name="TechResearcher",
+        model=Gemini(
+            model="gemini-2.5-flash-lite",
+            retry_options=retry_config
+        ),
+        instruction="""Research the latest AI/ML trends. Include 3 key developments,
+                        the main companies involved, and the potential impact. Keep the report very concise (100 words).""",
+        tools=[google_search],
+        output_key="tech_research",  # The result of this agent will be stored in the session state with this key.
+        )       
+
+def health_researcher(retry_config) -> Agent:
+    return Agent(
+            name="HealthResearcher",
+            model=Gemini(
+                model="gemini-2.5-flash-lite",
+                retry_options=retry_config
+            ),
+            instruction="""Research recent medical breakthroughs. Include 3 significant advances,
+                            their practical applications, and estimated timelines. Keep the report concise (100 words).""",
+            tools=[google_search],
+            output_key="health_research",  # The result will be stored with this key.
+        )
+
+
+def finance_researcher(retry_config) -> Agent:
+    return Agent(
+    name="FinanceResearcher",
+        model=Gemini(
+            model="gemini-2.5-flash-lite",
+            retry_options=retry_config
+        ),
+        instruction="""Research current fintech trends. Include 3 key trends,
+                        their market implications, and the future outlook. Keep the report concise (100 words).""",
+        tools=[google_search],
+        output_key="finance_research",  # The result will be stored with this key.
+    )
+
+
+def aggregator_agent(retry_config) -> Agent:
+    return Agent(
+        name="AggregatorAgent",
+        model=Gemini(
+            model="gemini-2.5-flash-lite",
+            retry_options=retry_config
+        ),
+        # It uses placeholders to inject the outputs from the parallel agents, which are now in the session state.
+        instruction="""Combine these three research findings into a single executive summary:
+
+        **Technology Trends:**
+        {tech_research}
+        
+        **Health Breakthroughs:**
+        {health_research}
+        
+        **Finance Innovations:**
+        {finance_research}
+        
+        Your summary should highlight common themes, surprising connections, and the most important key takeaways from all three reports. The final summary should be around 200 words.""",
+        output_key="executive_summary",  # This will be the final output of the entire system.
+)
+
+
 
 
 

@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 
 from google.adk.agents import Agent
-from agents.researcher_agent_coordinator import researcher_agent_coordinator
+from agents.agent_coordinators import researcher_agent_coordinator, researcher_agent_coordinator_paralell_root
 from agents.agents import research_agent, simple_assistan_agent, sumarizer_agent
 from retry_config import build_retry_config
 
@@ -16,7 +16,8 @@ def build_agent(agent: str) -> Agent:
         "simple_assistan_agent": simple_assistan_agent,
         "research_agent": research_agent,
         "sumarizer_agent": sumarizer_agent,
-        "researcher_agent_coordinator": researcher_agent_coordinator
+        "researcher_agent_coordinator": researcher_agent_coordinator,
+        "researcher_agent_coordinator_paralell_root": researcher_agent_coordinator_paralell_root
     }
 
     agent_requested = agents.get(agent)
