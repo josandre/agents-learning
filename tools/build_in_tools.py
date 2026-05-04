@@ -1,6 +1,7 @@
 from google.adk.models.google_llm import Gemini
 from google.adk.agents import Agent, LlmAgent
 from google.adk.code_executors import BuiltInCodeExecutor
+from google.adk.tools.tool_context import ToolContext
 
 LARGE_ORDER_THRESHOLD = 5
 
@@ -36,7 +37,7 @@ def place_shipping_order(num_containers: int, destination: str, tool_context: To
         Dictionary with order status
     """
 
-# -----------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------------
     # -----------------------------------------------------------------------------------------------
     # SCENARIO 1: Small orders (≤5 containers) auto-approve
     if num_containers <= LARGE_ORDER_THRESHOLD:

@@ -166,10 +166,10 @@ def filesystem_agent(retry_config) -> Agent:
         tools=[mcp_filesystem_server()],
     )
 
-def shipping_agent(retry_config) -> Agent:
+def shipping_agent() -> Agent:
     return LlmAgent(
             name="shipping_agent",
-            model=Gemini(model="gemini-2.5-flash-lite", retry_options=retry_config),
+            model=Gemini(model="gemini-2.5-flash-lite"),
             instruction="""You are a shipping coordinator assistant.
         
         When users request to ship containers:

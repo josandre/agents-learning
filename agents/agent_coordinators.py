@@ -42,7 +42,7 @@ def  researcher_agent_coordinator_paralell_root(retry_config) -> Agent:
 def build_shipping_agent_HIL() -> App:
     return App(
         name="shipping_coordinator",
-        root_agent=shipping_agent,
+        root_agent=shipping_agent(),
         resumability_config=ResumabilityConfig(is_resumable=True),
     )
 
