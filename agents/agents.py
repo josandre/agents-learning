@@ -3,11 +3,14 @@
 import os
 from dotenv import load_dotenv
 
-from google.adk.agents import Agent
+from google.adk.agents import Agent, LlmAgent
 from google.adk.models.google_llm import Gemini
-from google.adk.tools import google_search
+from google.adk.tools import AgentTool, FunctionTool, google_search
 
-from retry_config import build_retry_config
+
+from tools.build_in_tools import calculation_tool_agent, place_shipping_order
+from tools.custom_function_tools import get_fee_for_payment_method, get_exchange_rate
+from tools.mcp.mcp_s import mcp_image_server
 
 
 load_dotenv()
@@ -122,6 +125,58 @@ def aggregator_agent(retry_config) -> Agent:
         Your summary should highlight common themes, surprising connections, and the most important key takeaways from all three reports. The final summary should be around 200 words.""",
         output_key="executive_summary",  # This will be the final output of the entire system.
 )
+
+
+# Currency agent with custom function tools
+def currency_agent(retry_config) -> Agent:
+    return LlmAgent(
+        name = "currency_agent",
+        model = Gemini(model="gemini-2.5-flash-lite", retry_options=retry_config),
+        instruction="""You are a smart currency conversion assistant. You must strictly follow these steps and use the available tools.
+
+            For any currency conversion request:
+
+            1. Get Transaction Fee: Use the get_fee_for_payment_method() tool to determine the transaction fee.
+            2. Get Exchange Rate: Use the get_exchange_rate() tool to get the currency conversion rate.
+            3. Error Check: After each tool call, you must check the "status" field in the response. If the status is "error", you must stop and clearly explain the issue to the user.
+            4. Calculate Final Amount (CRITICAL): You are strictly prohibited from performing any arithmetic calculations yourself. You must use the calculation_agent tool to generate Python code that calculates the final converted amount. This 
+                code will use the fee information from step 1 and the exchange rate from step 2.
+            5. Provide Detailed Breakdown: In your summary, you must:
+                * State the final converted amount.
+                * Explain how the result was calculated, including:
+                    * The fee percentage and the fee amount in the original currency.
+                    * The amount remaining after deducting the fee.
+                    * The exchange rate applied.
+                """,
+        tools=[get_fee_for_payment_method, get_exchange_rate, AgentTool(agent=calculation_tool_agent(retry_config))],
+)
+
+
+def image_agent(retry_config) -> Agent:
+    return LlmAgent(
+        model=Gemini(model="gemini-2.5-flash-lite", retry_options=retry_config),
+        name="image_agent",
+        instruction="Use the MCP Tool to generate images for user queries",
+        tools=[mcp_image_server],
+)
+
+def shipping_agent(retry_config) -> Agent:
+    return LlmAgent(
+            name="shipping_agent",
+            model=Gemini(model="gemini-2.5-flash-lite", retry_options=retry_config),
+            instruction="""You are a shipping coordinator assistant.
+        
+        When users request to ship containers:
+        1. Use the place_shipping_order tool with the number of containers and destination
+        2. If the order status is 'pending', inform the user that approval is required
+        3. After receiving the final result, provide a clear summary including:
+            - Order status (approved/rejected)
+            - Order ID (if available)
+            - Number of containers and destination
+        4. Keep responses concise but informative
+        """,
+            tools=[FunctionTool(func=place_shipping_order)],
+    )
 
 
 

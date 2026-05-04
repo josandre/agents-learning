@@ -1,8 +1,8 @@
 from google.adk.agents import Agent, ParallelAgent, SequentialAgent
 from google.adk.models.google_llm import Gemini
-from google.adk.tools import AgentTool, google_search
-
-from agents.agents import research_agent, sumarizer_agent, tech_researcher, health_researcher, finance_researcher, aggregator_agent
+from google.adk.tools import AgentTool
+from google.adk.apps.app import App, ResumabilityConfig
+from agents.agents import research_agent, shipping_agent, sumarizer_agent, tech_researcher, health_researcher, finance_researcher, aggregator_agent
 
 
 # This agent Orchestrates the workflow by calling sub-agents as tools. Is not a DO-ALL agent
@@ -36,4 +36,15 @@ def  researcher_agent_coordinator_paralell_root(retry_config) -> Agent:
     return SequentialAgent(
         name="ResearchSystem",
         sub_agents=[researcher_agent_coordinator_paralell(retry_config), aggregator_agent(retry_config)],
-    ) 
+    )
+
+
+def build_shipping_agent_HIL() -> App:
+    return App(
+        name="shipping_coordinator",
+        root_agent=shipping_agent,
+        resumability_config=ResumabilityConfig(is_resumable=True),
+    )
+
+
+
