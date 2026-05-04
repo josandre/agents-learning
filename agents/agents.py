@@ -10,7 +10,9 @@ from google.adk.tools import AgentTool, FunctionTool, google_search
 
 from tools.build_in_tools import calculation_tool_agent, place_shipping_order
 from tools.custom_function_tools import get_fee_for_payment_method, get_exchange_rate
-from tools.mcp.mcp_s import mcp_image_server
+from tools.mcp.mcp_s import mcp_filesystem_server
+
+
 
 
 load_dotenv()
@@ -152,13 +154,17 @@ def currency_agent(retry_config) -> Agent:
 )
 
 
-def image_agent(retry_config) -> Agent:
+def filesystem_agent(retry_config) -> Agent:
     return LlmAgent(
-        model=Gemini(model="gemini-2.5-flash-lite", retry_options=retry_config),
-        name="image_agent",
-        instruction="Use the MCP Tool to generate images for user queries",
-        tools=[mcp_image_server],
-)
+        model="gemini-2.5-flash",
+        name="filesystem_agent",
+        instruction="""
+                    You can use filesystem tools in /tmp.
+                    When asked to create, list, or read a file, use the available filesystem capability.
+                    Do not output code or JSON.
+                    """,
+        tools=[mcp_filesystem_server()],
+    )
 
 def shipping_agent(retry_config) -> Agent:
     return LlmAgent(
