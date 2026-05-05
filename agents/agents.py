@@ -8,11 +8,9 @@ from google.adk.models.google_llm import Gemini
 from google.adk.tools import AgentTool, FunctionTool, google_search
 
 
-from tools.build_in_tools import calculation_tool_agent, place_shipping_order
-from tools.custom_function_tools import get_fee_for_payment_method, get_exchange_rate
+from tools.build_in_tools import calculation_tool_agent
+from tools.custom_function_tools import get_fee_for_payment_method, get_exchange_rate, place_shipping_order
 from tools.mcp.mcp_s import mcp_filesystem_server
-
-
 
 
 load_dotenv()
@@ -183,6 +181,15 @@ def shipping_agent() -> Agent:
         """,
             tools=[FunctionTool(func=place_shipping_order)],
     )
+
+def image_agent(retry_config) -> Agent:
+    return LlmAgent(
+        model=Gemini(model="gemini-2.5-flash-lite", retry_options=retry_config),
+        name="image_agent",
+        instruction="Use the MCP Tool to generate images for user queries",
+        tools=[mcp_filesystem_server()],
+)
+
 
 
 

@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from google.adk import Runner
 from google.adk.agents import Agent
 from agents.agent_coordinators import build_shipping_agent_HIL, researcher_agent_coordinator, researcher_agent_coordinator_paralell_root
-from agents.agents import research_agent, shipping_agent, simple_assistan_agent, sumarizer_agent, currency_agent, filesystem_agent
+from agents.agents import research_agent, shipping_agent, simple_assistan_agent, sumarizer_agent, currency_agent, filesystem_agent, image_agent
 from helpers.helper_process_events import check_for_approval, create_approval_response, print_agent_response
 from retry_config import build_retry_config
 from google.adk.sessions import InMemorySessionService
@@ -26,6 +26,7 @@ def build_agent(agent: str) -> Agent:
         "currency_agent": currency_agent,
         "filesystem_agent": filesystem_agent,
         "shipping_agent": shipping_agent,
+        "image_agent": image_agent
     }
 
     agent_requested = agents.get(agent)

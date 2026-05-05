@@ -18,3 +18,18 @@ def mcp_filesystem_server() -> McpToolset:
         ),
         tool_filter=["list_directory", "write_file", "read_file"],
     )
+
+def mcp_filesystem_server() -> McpToolset:
+    return McpToolset(
+    connection_params=StdioConnectionParams(
+        server_params=StdioServerParameters(
+            command="npx",  # Run MCP server via npx
+            args=[
+                "-y",  # Argument for npx to auto-confirm install
+                "@modelcontextprotocol/server-everything",
+            ],
+            tool_filter=["getTinyImage"],
+        ),
+        timeout=30,
+    )
+)
